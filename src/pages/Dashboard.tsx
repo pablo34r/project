@@ -177,7 +177,25 @@ const Dashboard: React.FC = () => {
             />
           </div>
           <div className="flex gap-4">
-            <div className="flex bg-gray-100 rounded-lg p-1">
+            
+            <button
+              onClick={() => setShowTaskForm(true)}
+              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+            >
+              <Plus className="w-5 h-5" />
+              <span className="hidden sm:inline">Nueva Tarea</span>
+            </button>
+          </div>
+          
+
+        </div>
+        <button
+  onClick={requestNotificationPermission}
+  className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
+>
+  🔔 Activar notificaciones
+</button>
+<div className="flex bg-gray-100 rounded-lg p-1">
               <button
                 onClick={() => setCurrentView('list')}
                 className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
@@ -199,23 +217,6 @@ const Dashboard: React.FC = () => {
                 Categorías
               </button>
             </div>
-            <button
-              onClick={() => setShowTaskForm(true)}
-              className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-            >
-              <Plus className="w-5 h-5" />
-              <span className="hidden sm:inline">Nueva Tarea</span>
-            </button>
-          </div>
-          
-
-        </div>
-        <button
-  onClick={requestNotificationPermission}
-  className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
->
-  🔔 Activar notificaciones
-</button>
         {currentView === 'list' ? (
           <TaskList
             tasks={filteredTasks}
