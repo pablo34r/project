@@ -6,5 +6,7 @@ export interface Task {
   category: string;
   priority: 'alta' | 'media' | 'baja';
   status: 'pendiente' | 'en-progreso' | 'completada';
-  dueDate: string;
+  dueDate: string; 
+  startTime?: string; 
+  endTime?: string;   
 }

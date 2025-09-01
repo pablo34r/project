@@ -18,6 +18,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
     priority: 'media' as 'alta' | 'media' | 'baja',
     status: 'pendiente' as 'pendiente' | 'en-progreso' | 'completada',
     dueDate: '',
+    startTime: '',
+    endTime: '',
   });
 
   useEffect(() => {
@@ -29,6 +31,8 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
         priority: task.priority,
         status: task.status,
         dueDate: task.dueDate,
+        startTime: task.startTime || '',
+        endTime: task.endTime || '',
       });
     }
   }, [task]);
@@ -152,19 +156,31 @@ const TaskForm: React.FC<TaskFormProps> = ({ task, onSubmit, onCancel }) => {
             </div>
 
             <div>
-              <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-2">
-                Fecha Límite
-              </label>
-              <input
-                type="date"
-                id="dueDate"
-                name="dueDate"
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-                value={formData.dueDate}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
+  <label htmlFor="dueDate" className="block text-sm font-medium text-gray-700 mb-2">
+    Fecha y Hora Límite
+  </label>
+  <input
+    type="datetime-local"
+    id="dueDate"
+    name="dueDate"
+    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+    value={
+      formData.dueDate
+        ? new Date(formData.dueDate).toISOString().slice(0, 16)
+        : ""
+    }
+    onChange={e => {
+      const localDate = new Date(e.target.value);
+      setFormData(prev => ({
+        ...prev,
+        dueDate: localDate.toString(),
+      }));
+    }}
+  />
+</div>
+
+          
+        </div>
 
           <div className="flex space-x-4 pt-4">
             <button

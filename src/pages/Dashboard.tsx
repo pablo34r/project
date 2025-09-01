@@ -9,6 +9,25 @@ import CategoryView from '../components/CategoryView';
 import { Task } from '../types/Task';
 import { Plus } from 'lucide-react';
 
+
+const requestNotificationPermission = async () => {
+  if (!("Notification" in window)) {
+    alert("Tu navegador no soporta notificaciones.");
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+  if (permission === "granted") {
+    new Notification("✅ Notificaciones activadas", {
+      body: "Te avisaremos cuando una tarea esté cerca.",
+    });
+  } else if (permission === "denied") {
+    alert(
+      "Has bloqueado las notificaciones. Actívalas manualmente en la configuración del navegador."
+    );
+  }
+};
+
 const Dashboard: React.FC = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -22,7 +41,7 @@ const Dashboard: React.FC = () => {
     priority: '',
     status: '',
   });
-
+  
   useEffect(() => {
     if (user) {
       const storedTasks = localStorage.getItem(`tasks_${user.id}`);
@@ -31,6 +50,31 @@ const Dashboard: React.FC = () => {
       }
     }
   }, [user]);
+
+
+  useEffect(() => {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+
+    const interval = setInterval(() => {
+      const now = new Date();
+
+      tasks.forEach(task => {
+        if (task.dueDate) {
+          const taskDateTime = new Date(task.dueDate);
+          const diffMinutes = (taskDateTime.getTime() - now.getTime()) / 60000;
+
+          if (diffMinutes > 0 && diffMinutes <= 5) {
+            new Notification("⏰ Recordatorio de tarea", {
+              body: `La tarea "${task.title}" vence en ${Math.round(diffMinutes)} min.`,
+            });
+          }
+        }
+      });
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [tasks]);
 
   useEffect(() => {
     if (user) {
@@ -77,6 +121,13 @@ const Dashboard: React.FC = () => {
     setTasks([...tasks, newTask]);
     setShowTaskForm(false);
   };
+  const handleCompleteTask = (taskId: string) => {
+    const updatedTasks = tasks.map(task =>
+      task.id === taskId ? { ...task, status: "completada" } : task
+    );
+    setTasks(updatedTasks);
+  };
+
 
   const handleEditTask = (taskData: Omit<Task, 'id' | 'userId'>) => {
     if (editingTask) {
@@ -114,7 +165,7 @@ const Dashboard: React.FC = () => {
           </h1>
           <p className="text-gray-600">Gestiona tus actividades de manera eficiente</p>
         </div>
-
+        
         <ProgressBar tasks={tasks} />
 
         <div className="flex flex-col lg:flex-row gap-6 mb-8">
@@ -156,19 +207,28 @@ const Dashboard: React.FC = () => {
               <span className="hidden sm:inline">Nueva Tarea</span>
             </button>
           </div>
-        </div>
+          
 
+        </div>
+        <button
+  onClick={requestNotificationPermission}
+  className="bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
+>
+  🔔 Activar notificaciones
+</button>
         {currentView === 'list' ? (
           <TaskList
             tasks={filteredTasks}
             onEdit={openEditForm}
             onDelete={handleDeleteTask}
+            onComplete={handleCompleteTask}
           />
         ) : (
           <CategoryView
             tasks={filteredTasks}
             onEdit={openEditForm}
             onDelete={handleDeleteTask}
+            
           />
         )}
 

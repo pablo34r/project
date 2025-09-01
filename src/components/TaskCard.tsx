@@ -1,14 +1,15 @@
 import React from 'react';
 import { Task } from '../types/Task';
-import { Edit, Trash2, Calendar, Flag, Clock } from 'lucide-react';
+import { Edit, Trash2, Calendar, Flag, Clock, CheckCircle } from 'lucide-react';
 
 interface TaskCardProps {
   task: Task;
   onEdit: (task: Task) => void;
   onDelete: (taskId: string) => void;
+  onComplete: (taskId: string) => void; // ✅ nueva prop
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete, onComplete }) => {
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case 'alta':
@@ -83,6 +84,17 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
           )}
         </div>
         <div className="flex space-x-2 ml-4">
+          {/* ✅ Nuevo botón para completar */}
+          {task.status !== 'completada' && (
+            <button
+              onClick={() => onComplete(task.id)}
+              className="p-2 text-gray-400 hover:text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+              title="Marcar como completada"
+            >
+              <CheckCircle className="w-4 h-4" />
+            </button>
+          )}
+
           <button
             onClick={() => onEdit(task)}
             className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
